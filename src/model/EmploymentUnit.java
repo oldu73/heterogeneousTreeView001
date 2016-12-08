@@ -1,11 +1,12 @@
 package model;
 
-import java.util.function.Function;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import java.util.function.Function;
 
 public class EmploymentUnit<T extends EmploymentUnit<?>> {
 
@@ -37,6 +38,7 @@ public class EmploymentUnit<T extends EmploymentUnit<?>> {
         return this.name;
     }
 
+    @XmlAttribute(name = "name", required = false)
     public final String getName() {
         return this.nameProperty().get();
     }

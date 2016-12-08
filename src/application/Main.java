@@ -8,26 +8,25 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import model.Company;
-import model.Department;
-import model.Employee;
-import model.EmploymentUnit;
-import model.Role;
+import model.*;
 import ui.ModelTree;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.File;
+
 public class Main extends Application {
+
+    private Company company;
 
     @Override
     public void start(Stage primaryStage) {
 
-        Company company = createCompany();
+        company = createCompany();
 
         ModelTree<EmploymentUnit<?>> tree = new ModelTree<EmploymentUnit<?>>(company,
                 EmploymentUnit::getSubUnits,
@@ -80,6 +79,8 @@ public class Main extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        savePersonDataToFile();
     }
 
     private Company createCompany() {
@@ -116,6 +117,41 @@ public class Main extends Application {
         comp.getSubUnits().addAll(executive, engineering, hr);
 
         return comp ;
+    }
+
+    /**
+     * Saves the current employee data to the specified file.
+     *
+     * @param
+     */
+    //public void savePersonDataToFile(File file) {     -> add @param javadoc in header above
+    public void savePersonDataToFile() {
+
+        File file = new File("C:\\Users\\oldu7\\Desktop\\test3.xml");
+
+        try {
+            JAXBContext context = JAXBContext.newInstance(DepartmentWrapper.class);
+            Marshaller m = context.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            // Wrapping our person data.
+            DepartmentWrapper wrapper = new DepartmentWrapper();
+            wrapper.setName(company.getSubUnits().get(1).getName());
+            wrapper.setEmployees(company.getSubUnits().get(1).getSubUnits());
+
+            // Marshalling and saving XML to the file.
+            m.marshal(wrapper, file);
+
+            // Save the file path to the registry.
+            //setPersonFilePath(file);
+        } catch (Exception e) { // catches ANY exception
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Could not save data");
+            alert.setContentText("Could not save data to file:\n" + file.getPath());
+
+            alert.showAndWait();
+        }
     }
 
     public static void main(String[] args) {
